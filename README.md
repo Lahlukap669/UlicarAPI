@@ -1,6 +1,6 @@
 # API Documentation
 
-This API provides endpoints for managing a sports club system, including managing players (Igralci), coaches (Trenerji), clubs (Klubi), selections (Selekcije), and challenges (Izzivi).
+This API provides endpoints for managing a sports club system, including managing players (Igralci), coaches (Trenerji), clubs (Klubi), selections (Selekcije), and challenges (Izzivi). Database is on ElephantSQL which will cease to exist in 2025. API is for application testrun and all components including databse will be moved to production if testrun is a success.
 
 ## Endpoints
 
