@@ -1033,7 +1033,7 @@ def get_all_izzivi():
             """)
             result = db.session.execute(query).fetchall()
 
-            izzivi = [{'id': row.id, 'selekcija_id': row.selekcija_id, 'ime': row.ime, 'opis': row.opis, 'točkovanje': row.točkovanje, 'tedenski_challenge': row.tedenski_challenge} for row in result]
+            izzivi = [{'izzivi_id': row.izzivi_id, 'selekcija_id': row.selekcija_id, 'ime': row.ime, 'opis': row.opis, 'točkovanje': row.točkovanje, 'tedenski_challenge': row.tedenski_challenge} for row in result]
 
             return jsonify({'success': True, 'izzivi': izzivi}), 200
 
@@ -1042,6 +1042,7 @@ def get_all_izzivi():
             return jsonify({'success': False, 'error': str(e)}), 500
 
     return jsonify({'error': "POST method not allowed"}), 405
+
 
 ## GET ALL REGISTRACIJE
 @app.route("/get_all_registracije", methods=['GET'])
@@ -1286,6 +1287,39 @@ def get_selekcija_by_id():
 
     return jsonify({'error': "POST method not allowed"}), 405
 
+##GET SELEKCIJA BY KLUB ID
+@app.route("/get_selekcije_by_klub_id", methods=['POST'])
+def get_selekcije_by_klub_id():
+    if request.method == 'POST':
+        try:
+            # Get JSON data from the request
+            data = request.get_json()
+            klub_id = data.get('klub_id')
+
+            # Execute the SQL function to get selekcije
+            query = text("SELECT * FROM get_selekcije_by_klub_id(:klub_id)")
+            result = db.session.execute(query, {'klub_id': klub_id}).fetchall()
+
+            # Prepare the response
+            selekcije = []
+            for row in result:
+                selekcije.append({
+                    'id': row[0],           # First column: selekcija_id
+                    'selekcija': row[1],     # Second column: selekcija_name
+                    'opis': row[2]           # Third column: selekcija_opis
+                })
+
+            return jsonify(selekcije=selekcije), 200
+
+        except Exception as e:
+            print(f"Error: {e}")
+            return jsonify({"error": "Could not fetch selections"}), 500
+    else:
+        return jsonify({"error": "Invalid request method"}), 405
+
+
+
+
 ## GET KLUB BY ID
 @app.route("/get_klub_by_id", methods=['POST'])
 def get_klub_by_id():
@@ -1385,62 +1419,82 @@ def get_drugi_izziv_by_id():
 @app.route("/login_trenerji", methods=['POST'])
 def login_trenerji():
     if request.method == 'POST':
+        data = request.get_json()
+
+        email = data.get("email")
+        password = data.get("password")
+
+        # Hash the password
+        hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+
         try:
-            # Extract the email and password from the JSON request
-            podatki_json = request.get_json()
-            email = podatki_json.get("email")
-            password = podatki_json.get("password")
-
-            # Hash the password
-            hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
-
-            # Call the SQL function
             query = text("""
                 SELECT login_trenerji(:email, :hashed_password)
             """)
-            result = db.session.execute(query, {'email': email, 'hashed_password': hashed_password}).scalar()
+            trener_id = db.session.execute(query, {
+                'email': email,
+                'hashed_password': hashed_password
+            }).scalar()
 
-            if result:
-                return jsonify({'success': True, 'message': 'Login successful'}), 200
+            if trener_id:
+                return jsonify({
+                    'success': True,
+                    'message': 'Login successful',
+                    'trener_id': trener_id
+                }), 200
             else:
-                return jsonify({'success': False, 'message': 'Invalid credentials'}), 401
+                return jsonify({
+                    'success': False,
+                    'message': 'Invalid credentials'
+                }), 401
 
         except Exception as e:
             print(e)
-            return jsonify({'success': False, 'error': str(e)}), 500
+            return jsonify({
+                'success': False,
+                'message': 'An error occurred during login'
+            }), 500
 
-    return jsonify({'error': "GET method not allowed"}), 405
 
 ## LOGIN IGRALCI
 @app.route("/login_igralci", methods=['POST'])
 def login_igralci():
     if request.method == 'POST':
+        data = request.get_json()
+
+        username = data.get("username")
+        password = data.get("password")
+
+        # Hash the password
+        hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+
         try:
-            # Extract the username and password from the JSON request
-            podatki_json = request.get_json()
-            username = podatki_json.get("username")
-            password = podatki_json.get("password")
-
-            # Hash the password
-            hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
-
-            # Call the SQL function
             query = text("""
                 SELECT login_igralci(:username, :hashed_password)
             """)
-            result = db.session.execute(query, {'username': username, 'hashed_password': hashed_password}).scalar()
+            igralec_id = db.session.execute(query, {
+                'username': username,
+                'hashed_password': hashed_password
+            }).scalar()
 
-            if result:
-                return jsonify({'success': True, 'message': 'Login successful'}), 200
+            if igralec_id:
+                return jsonify({
+                    'success': True,
+                    'message': 'Login successful',
+                    'igralec_id': igralec_id
+                }), 200
             else:
-                return jsonify({'success': False, 'message': 'Invalid credentials'}), 401
+                return jsonify({
+                    'success': False,
+                    'message': 'Invalid credentials'
+                }), 401
 
         except Exception as e:
             print(e)
-            return jsonify({'success': False, 'error': str(e)}), 500
-
-    return jsonify({'error': "GET method not allowed"}), 405
-
+            return jsonify({
+                'success': False,
+                'message': 'An error occurred during login'
+            }), 500
 
 
 if __name__ == '__main__':

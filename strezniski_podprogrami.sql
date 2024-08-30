@@ -360,6 +360,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION get_selekcije_by_klub_id(p_klub_id BIGINT)
+RETURNS TABLE(selekcija_id BIGINT, selekcija_name VARCHAR, selekcija_opis TEXT) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT Selekcije.id AS selekcija_id, Selekcije.selekcija AS selekcija_name, Selekcije.opis AS selekcija_opis
+    FROM Selekcije
+    WHERE Selekcije.klub_id = p_klub_id::BIGINT;
+END;
+$$ LANGUAGE plpgsql;
+
+
 CREATE OR REPLACE FUNCTION get_klub_by_id(p_klub_id BIGINT)
 RETURNS TABLE(klubi_id BIGINT, ime VARCHAR) AS $$
 BEGIN
@@ -430,11 +441,13 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION get_all_izzivi()
-RETURNS TABLE(id BIGINT, selekcija_id BIGINT, ime VARCHAR, opis TEXT, točkovanje TEXT, tedenski_challenge BOOLEAN) AS $$
+RETURNS TABLE(izzivi_id BIGINT, selekcija_id BIGINT, ime VARCHAR, opis TEXT, točkovanje TEXT, tedenski_challenge BOOLEAN) AS $$
 BEGIN
     RETURN QUERY
     SELECT Izzivi.id, Izzivi.selekcija_id, Izzivi.ime, Izzivi.opis, Izzivi.točkovanje, Izzivi.tedenski_challenge
-    FROM Izzivi;
+    FROM Izzivi
+    ORDER BY Izzivi.id DESC -- Most recent entries first
+    LIMIT 10;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -639,33 +652,39 @@ $$ LANGUAGE plpgsql;
 
 -- LOGIN CHECKS
 CREATE OR REPLACE FUNCTION login_trenerji(p_email VARCHAR, p_hashed_password VARCHAR)
-RETURNS BOOLEAN AS $$
+RETURNS BIGINT AS $$
 DECLARE
-    v_exists BOOLEAN;
+    v_trener_id BIGINT;
 BEGIN
-    -- Check if the email and hashed password exist in Trenerji
-    SELECT EXISTS (
-        SELECT 1
-        FROM Trenerji
-        WHERE gmail = p_email AND geslo = p_hashed_password
-    ) INTO v_exists;
+    -- Check if the email and hashed password exist in Trenerji and return the ID
+    SELECT id
+    INTO v_trener_id
+    FROM Trenerji
+    WHERE gmail = p_email AND geslo = p_hashed_password;
 
-    RETURN v_exists;
+    RETURN v_trener_id;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE FUNCTION login_igralci(p_username VARCHAR, p_hashed_password VARCHAR)
-RETURNS BOOLEAN AS $$
+RETURNS BIGINT AS $$
 DECLARE
-    v_exists BOOLEAN;
+    v_igralec_id BIGINT;
 BEGIN
-    -- Check if the username and hashed password exist in Igralci
-    SELECT EXISTS (
-        SELECT 1
-        FROM Igralci
-        WHERE username = p_username AND geslo = p_hashed_password
-    ) INTO v_exists;
+    -- Check if the username and hashed password exist in Igralci and return the ID
+    SELECT id
+    INTO v_igralec_id
+    FROM Igralci
+    WHERE username = p_username AND geslo = p_hashed_password;
 
-    RETURN v_exists;
+    RETURN v_igralec_id;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
+
