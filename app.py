@@ -243,9 +243,10 @@ def create_izziv_igralec():
         except Exception as e:
             print(e)
             db.session.rollback()
-            return jsonify({'success': False, 'error': str(e)}), 500
+            return jsonify({'success': False, 'error': str(e)}), 400
 
     return jsonify({'error': "GET method not allowed"}), 405
+
 
 ## CREATE DRUGI_IZZIV
 @app.route("/create_drugi_izziv", methods=['POST'])

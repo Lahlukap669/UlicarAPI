@@ -69,14 +69,31 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION create_izziv_igralec(p_trener_id BIGINT, p_igralec_id BIGINT, p_izziv_id BIGINT, p_test1 FLOAT)
+CREATE OR REPLACE FUNCTION create_izziv_igralec(
+    p_trener_id BIGINT, 
+    p_igralec_id BIGINT, 
+    p_izziv_id BIGINT, 
+    p_test1 FLOAT
+)
 RETURNS BIGINT AS $$
 DECLARE
     izziv_igralec_id BIGINT;
 BEGIN
-    INSERT INTO Izzivi_igralci (trener_id, igralec_id, izziv_id, test1, test2, score_difference)
-    VALUES (p_trener_id, p_igralec_id, p_izziv_id, p_test1, NULL, NULL)
-    RETURNING id INTO izziv_igralec_id;
+    -- Check if the combination of igralec_id and izziv_id already exists
+    IF EXISTS (
+        SELECT 1 
+        FROM Izzivi_igralci 
+        WHERE igralec_id = p_igralec_id AND izziv_id = p_izziv_id
+    ) THEN
+        -- Raise an exception if a duplicate is found
+        RAISE EXCEPTION 'Igralec že ima meritve za ta izziv';
+    ELSE
+        -- If no duplicate is found, insert the new record
+        INSERT INTO Izzivi_igralci (trener_id, igralec_id, izziv_id, test1, test2, score_difference)
+        VALUES (p_trener_id, p_igralec_id, p_izziv_id, p_test1, NULL, NULL)
+        RETURNING id INTO izziv_igralec_id;
+    END IF;
+
     RETURN izziv_igralec_id;
 END;
 $$ LANGUAGE plpgsql;
