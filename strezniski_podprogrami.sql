@@ -105,17 +105,44 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION create_registracija(p_ime VARCHAR, p_priimek VARCHAR, p_geslo VARCHAR, p_username VARCHAR, p_tel VARCHAR, p_kraj_kluba VARCHAR, p_selekcija_id BIGINT, p_tip VARCHAR)
+CREATE OR REPLACE FUNCTION create_registracija(
+    p_ime VARCHAR, 
+    p_priimek VARCHAR, 
+    p_geslo VARCHAR, 
+    p_username VARCHAR, 
+    p_tel VARCHAR, 
+    p_kraj_kluba VARCHAR, 
+    p_selekcija_id BIGINT, 
+    p_tip VARCHAR
+)
 RETURNS BIGINT AS $$
 DECLARE
     registracija_id BIGINT;
+    v_exists BOOLEAN;
 BEGIN
-    INSERT INTO Registracija (ime, priimek, geslo, username, tel, kraj_kluba, selekcija_id, tip, status)
-    VALUES (p_ime, p_priimek, p_geslo, p_username, p_tel, p_kraj_kluba, p_selekcija_id, p_tip, 'pending')
-    RETURNING id INTO registracija_id;
-    RETURN registracija_id;
+    -- Check if the username already exists
+    SELECT EXISTS (
+        SELECT 1 FROM Registracija WHERE username = p_username
+    ) INTO v_exists;
+
+    IF v_exists THEN
+        -- Raise an exception or return a specific value indicating that the username is taken
+        RAISE EXCEPTION 'Username already exists';
+    ELSE
+        -- Insert the new registration if the username is not taken
+        INSERT INTO Registracija (
+            ime, priimek, geslo, username, tel, kraj_kluba, selekcija_id, tip, status
+        )
+        VALUES (
+            p_ime, p_priimek, p_geslo, p_username, p_tel, p_kraj_kluba, p_selekcija_id, p_tip, 'pending'
+        )
+        RETURNING id INTO registracija_id;
+        
+        RETURN registracija_id;
+    END IF;
 END;
 $$ LANGUAGE plpgsql;
+
 
 /*UPDATE FUNCTIONS*/
 CREATE OR REPLACE FUNCTION update_klub(p_klub_id BIGINT, p_ime VARCHAR)
