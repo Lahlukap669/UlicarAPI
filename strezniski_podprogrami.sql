@@ -377,6 +377,38 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION get_izzivi_by_selekcija_id(p_selekcija_id BIGINT)
+RETURNS TABLE(
+    izzivi_id BIGINT,
+    selekcija_id BIGINT,
+    ime VARCHAR,
+    opis TEXT,
+    točkovanje TEXT,
+    tedenski_challenge BOOLEAN
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT id AS izzivi_id, selekcija_id, ime, opis, točkovanje, tedenski_challenge
+    FROM Izzivi
+    WHERE selekcija_id = p_selekcija_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_trenerji_selekcije_by_trener_id(p_trener_id BIGINT)
+RETURNS TABLE(
+    trener_selekcija_id BIGINT,
+    trenerji_selekcije_trener_id BIGINT,
+    selekcija_id BIGINT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT ts.id AS trener_selekcija_id, ts.trener_id AS trenerji_selekcije_trener_id, ts.selekcija_id
+    FROM Trenerji_selekcije ts
+    WHERE ts.trener_id = p_trener_id;
+END;
+$$ LANGUAGE plpgsql;
+
+
 CREATE OR REPLACE FUNCTION get_selekcija_by_id(p_selekcija_id BIGINT)
 RETURNS TABLE(selekcije_id BIGINT, klub_id BIGINT, selekcija VARCHAR, opis TEXT) AS $$
 BEGIN

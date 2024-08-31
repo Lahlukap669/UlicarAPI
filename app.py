@@ -972,7 +972,7 @@ def get_all_igralci_by_selekcija_id():
             """)
             result = db.session.execute(query, {'selekcija_id': selekcija_id}).fetchall()
 
-            igralci = [{'id': row.id, 'ime': row.ime, 'priimek': row.priimek, 'username': row.username, 'tel': row.tel, 'score': row.score} for row in result]
+            igralci = [{'id': row.igralci_id, 'ime': row.ime, 'priimek': row.priimek, 'username': row.username, 'tel': row.tel, 'score': row.score} for row in result]
 
             return jsonify({'success': True, 'igralci': igralci}), 200
 
@@ -981,6 +981,7 @@ def get_all_igralci_by_selekcija_id():
             return jsonify({'success': False, 'error': str(e)}), 500
 
     return jsonify({'error': "GET method not allowed"}), 405
+
 
 ## GET METHODES
 ## GET ALL KLUBI
@@ -1022,6 +1023,38 @@ def get_all_trenerji():
             return jsonify({'success': False, 'error': str(e)}), 500
 
     return jsonify({'error': "POST method not allowed"}), 405
+
+
+## GET ALL SELEKCIJE BY TRENER ID
+@app.route("/get_trenerji_selekcije_by_trener_id", methods=['POST'])
+def get_trenerji_selekcije_by_trener_id():
+    if request.method == 'POST':
+        try:
+            # Extract the trener_id from the JSON request
+            data = request.get_json()
+            trener_id = data.get("trener_id")
+
+            # Call the SQL function
+            query = text("""
+                SELECT * FROM get_trenerji_selekcije_by_trener_id(:trener_id)
+            """)
+            result = db.session.execute(query, {'trener_id': trener_id}).fetchall()
+
+            trenerji_selekcije = [
+                {'trener_selekcija_id': row.trener_selekcija_id,
+                 'trener_id': row.trenerji_selekcije_trener_id,
+                 'selekcija_id': row.selekcija_id}
+                for row in result
+            ]
+
+            return jsonify({'success': True, 'trenerji_selekcije': trenerji_selekcije}), 200
+
+        except Exception as e:
+            print(e)
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    return jsonify({'error': "POST method not allowed"}), 405
+
 
 ## GET ALL IZZIVI - IDEAS
 @app.route("/get_all_izzivi", methods=['GET'])
@@ -1349,6 +1382,41 @@ def get_klub_by_id():
             return jsonify({'success': False, 'error': str(e)}), 500
 
     return jsonify({'error': "POST method not allowed"}), 405
+
+## GET IZZIVI BY SELEKCIJA ID
+@app.route("/get_izzivi_by_selekcija_id", methods=['POST'])
+def get_izzivi_by_selekcija_id():
+    if request.method == 'POST':
+        try:
+            # Extract the selekcija_id from the JSON request
+            data = request.get_json()
+            selekcija_id = data.get("selekcija_id")
+
+            # Call the SQL function
+            query = text("""
+                SELECT * FROM get_izzivi_by_selekcija_id(:selekcija_id)
+            """)
+            result = db.session.execute(query, {'selekcija_id': selekcija_id}).fetchall()
+
+            izzivi = [
+                {'izzivi_id': row.izzivi_id,
+                 'selekcija_id': row.selekcija_id,
+                 'ime': row.ime,
+                 'opis': row.opis,
+                 'tockovanje': row.točkovanje,
+                 'tedenski_challenge': row.tedenski_challenge}
+                for row in result
+            ]
+
+            return jsonify({'success': True, 'izzivi': izzivi}), 200
+
+        except Exception as e:
+            print(e)
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    return jsonify({'error': "POST method not allowed"}), 405
+
+
 
 ## GET IZZIV BY ID
 @app.route("/get_izziv_by_id", methods=['POST'])
