@@ -273,7 +273,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 1. Delete Klub
 
 - **Endpoint:** `/delete_klub`
-- **Method:** `DELETE`
+- **Method:** `POST`
 - **Description:** Deletes a club.
 - **Request:**
   {
@@ -291,7 +291,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 2. Delete Trener
 
 - **Endpoint:** `/delete_trener`
-- **Method:** `DELETE`
+- **Method:** `POST`
 - **Description:** Deletes a coach.
 - **Request:**
   {
@@ -309,7 +309,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 3. Delete Selekcija
 
 - **Endpoint:** `/delete_selekcija`
-- **Method:** `DELETE`
+- **Method:** `POST`
 - **Description:** Deletes a selection.
 - **Request:**
   {
@@ -327,7 +327,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 4. Delete Igralec
 
 - **Endpoint:** `/delete_igralec`
-- **Method:** `DELETE`
+- **Method:** `POST`
 - **Description:** Deletes a player.
 - **Request:**
   {
@@ -345,7 +345,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 5. Delete Trener Selekcija
 
 - **Endpoint:** `/delete_trener_selekcija`
-- **Method:** `DELETE`
+- **Method:** `POST`
 - **Description:** Deletes a coach's assignment to a selection.
 - **Request:**
   {
@@ -363,7 +363,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 6. Delete Izziv
 
 - **Endpoint:** `/delete_izziv`
-- **Method:** `DELETE`
+- **Method:** `POST`
 - **Description:** Deletes a challenge.
 - **Request:**
   {
@@ -381,7 +381,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 7. Delete Izziv Igralec
 
 - **Endpoint:** `/delete_izziv_igralec`
-- **Method:** `DELETE`
+- **Method:** `POST`
 - **Description:** Deletes a player's participation in a challenge.
 - **Request:**
   {
@@ -399,7 +399,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 8. Delete Drugi Izziv
 
 - **Endpoint:** `/delete_drugi_izziv`
-- **Method:** `DELETE`
+- **Method:** `POST`
 - **Description:** Deletes an additional challenge.
 - **Request:**
   {
@@ -417,7 +417,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 9. Delete Drugi Izziv Igralec
 
 - **Endpoint:** `/delete_drugi_izziv_igralec`
-- **Method:** `DELETE`
+- **Method:** `POST`
 - **Description:** Deletes a player's participation in an additional challenge.
 - **Request:**
   {
@@ -437,7 +437,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 1. Update Klub
 
 - **Endpoint:** `/update_klub`
-- **Method:** `PUT`
+- **Method:** `POST`
 - **Description:** Updates club details.
 - **Request:**
   {
@@ -456,7 +456,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 2. Update Trener
 
 - **Endpoint:** `/update_trener`
-- **Method:** `PUT`
+- **Method:** `POST`
 - **Description:** Updates coach details.
 - **Request:**
   {
@@ -479,7 +479,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 3. Update Selekcija
 
 - **Endpoint:** `/update_selekcija`
-- **Method:** `PUT`
+- **Method:** `POST`
 - **Description:** Updates selection details.
 - **Request:**
   {
@@ -500,7 +500,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 4. Update Igralec
 
 - **Endpoint:** `/update_igralec`
-- **Method:** `PUT`
+- **Method:** `POST`
 - **Description:** Updates player details.
 - **Request:**
   {
@@ -525,7 +525,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 5. Update Trener Selekcija
 
 - **Endpoint:** `/update_trener_selekcija`
-- **Method:** `PUT`
+- **Method:** `POST`
 - **Description:** Updates the assignment of a coach to a selection.
 - **Request:**
   {
@@ -545,7 +545,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 6. Update Izziv
 
 - **Endpoint:** `/update_izziv`
-- **Method:** `PUT`
+- **Method:** `POST`
 - **Description:** Updates challenge details.
 - **Request:**
   {
@@ -568,7 +568,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 7. Update Izziv Igralec
 
 - **Endpoint:** `/update_izziv_igralec`
-- **Method:** `PUT`
+- **Method:** `POST`
 - **Description:** Updates a player's performance in a challenge.
 - **Request:**
   {
@@ -591,7 +591,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 8. Update Drugi Izziv
 
 - **Endpoint:** `/update_drugi_izziv`
-- **Method:** `PUT`
+- **Method:** `POST`
 - **Description:** Updates additional challenge details.
 - **Request:**
   {
@@ -611,7 +611,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 9. Update Drugi Izziv Igralec
 
 - **Endpoint:** `/update_drugi_izziv_igralec`
-- **Method:** `PUT`
+- **Method:** `POST`
 - **Description:** Updates a player's participation in an additional challenge.
 - **Request:**
   {
@@ -637,7 +637,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 1. Get Trener By ID
 
 - **Endpoint:** `/get_trener_by_id`
-- **Method:** `GET`
+- **Method:** `POST`
 - **Description:** Retrieves a coach by ID.
 - **Request:**
   {
@@ -662,7 +662,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 2. Get Igralec By ID
 
 - **Endpoint:** `/get_igralec_by_id`
-- **Method:** `GET`
+- **Method:** `POST`
 - **Description:** Retrieves a player by ID.
 - **Request:**
   {
@@ -689,7 +689,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 3. Get Selekcija By ID
 
 - **Endpoint:** `/get_selekcija_by_id`
-- **Method:** `GET`
+- **Method:** `POST`
 - **Description:** Retrieves a selection by ID.
 - **Request:**
   {
@@ -713,7 +713,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 4. Get Klub By ID
 
 - **Endpoint:** `/get_klub_by_id`
-- **Method:** `GET`
+- **Method:** `POST`
 - **Description:** Retrieves a club by ID.
 - **Request:**
   {
@@ -735,7 +735,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 5. Get Izziv By ID
 
 - **Endpoint:** `/get_izziv_by_id`
-- **Method:** `GET`
+- **Method:** `POST`
 - **Description:** Retrieves a challenge by ID.
 - **Request:**
   {
@@ -761,7 +761,7 @@ This API provides endpoints for managing a sports club system, including managin
 #### 6. Get Drugi Izziv By ID
 
 - **Endpoint:** `/get_drugi_izziv_by_id`
-- **Method:** `GET`
+- **Method:** `POST`
 - **Description:** Retrieves an additional challenge by ID.
 - **Request:**
   {
