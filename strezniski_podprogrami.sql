@@ -797,3 +797,32 @@ EXCEPTION
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION update_total_score_after_izzivi_igralci_change()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Recalculate the total score for the player in Igralci table
+    UPDATE Igralci
+    SET score = (
+        SELECT COALESCE(SUM(score_difference), 0)
+        FROM Izzivi_igralci
+        WHERE igralec_id = NEW.igralec_id
+    ) + (
+        SELECT COALESCE(SUM(tocke), 0)
+        FROM Drugi_izzivi_igralci
+        WHERE igralec_id = NEW.igralec_id
+    )
+    WHERE id = NEW.igralec_id;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_update_total_score_after_izzivi_igralci
+AFTER INSERT OR UPDATE ON Izzivi_igralci
+FOR EACH ROW
+EXECUTE FUNCTION update_total_score_after_izzivi_igralci_change();
+
+CREATE TRIGGER trg_update_total_score_after_drugi_izzivi_igralci
+AFTER INSERT OR UPDATE ON Drugi_izzivi_igralci
+FOR EACH ROW
+EXECUTE FUNCTION update_total_score_after_izzivi_igralci_change();
