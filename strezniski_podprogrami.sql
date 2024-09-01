@@ -307,6 +307,11 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION delete_izziv(p_izziv_id BIGINT)
 RETURNS BOOLEAN AS $$
 BEGIN
+    -- First, delete all related records from the Izzivi_igralci table
+    DELETE FROM Izzivi_igralci
+    WHERE izziv_id = p_izziv_id;
+
+    -- Then, delete the record from the Izzivi table
     DELETE FROM Izzivi
     WHERE id = p_izziv_id;
 
@@ -315,6 +320,8 @@ EXCEPTION WHEN OTHERS THEN
     RETURN FALSE;
 END;
 $$ LANGUAGE plpgsql;
+
+
 
 CREATE OR REPLACE FUNCTION delete_izziv_igralec(p_izziv_igralec_id BIGINT)
 RETURNS BOOLEAN AS $$
@@ -383,6 +390,32 @@ BEGIN
     WHERE Trenerji.id = p_trener_id;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_all_izzivi_igralci_by_izziv_id(p_izziv_id BIGINT)
+RETURNS TABLE(
+    izzivi_igralci_id BIGINT,
+    trener_id BIGINT,
+    igralec_id BIGINT,
+    izziv_id BIGINT,
+    test1 FLOAT,
+    test2 FLOAT,
+    score_difference FLOAT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        Izzivi_igralci.id AS izzivi_igralci_id,
+        Izzivi_igralci.trener_id,
+        Izzivi_igralci.igralec_id,
+        Izzivi_igralci.izziv_id,
+        Izzivi_igralci.test1,
+        Izzivi_igralci.test2,
+        Izzivi_igralci.score_difference
+    FROM Izzivi_igralci
+    WHERE Izzivi_igralci.izziv_id = p_izziv_id;
+END;
+$$ LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE FUNCTION get_igralec_by_id(p_igralec_id BIGINT)
 RETURNS TABLE(igralci_id BIGINT, selekcija_id BIGINT, ime VARCHAR, priimek VARCHAR, username VARCHAR, tel VARCHAR, score FLOAT) AS $$

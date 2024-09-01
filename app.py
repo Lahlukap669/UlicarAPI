@@ -577,16 +577,21 @@ def update_izziv():
 def update_izziv_igralec():
     if request.method == 'POST':
         try:
-            # Extract the details from the request data
-            podatki_json = request.get_json()
-            izziv_igralec_id = podatki_json.get("izziv_igralec_id")
-            trener_id = podatki_json.get("trener_id")
-            igralec_id = podatki_json.get("igralec_id")
-            izziv_id = podatki_json.get("izziv_id")
-            test1 = podatki_json.get("test1")
-            test2 = podatki_json.get("test2")
+            data = request.get_json()
 
-            # Call the update_izziv_igralec function in the database
+            # Extracting all necessary data from the request
+            izziv_igralec_id = data.get("izziv_igralec_id")
+            trener_id = data.get("trener_id")
+            igralec_id = data.get("igralec_id")
+            izziv_id = data.get("izziv_id")
+            test1 = data.get("test1")
+            test2 = data.get("test2")
+
+            # Validate that all required fields are present
+            if not all([izziv_igralec_id, trener_id, igralec_id, izziv_id, test1]):
+                return jsonify({'success': False, 'error': 'Missing data fields'}), 400
+
+            # Call the SQL function to update the record
             query = text("""
                 SELECT update_izziv_igralec(:izziv_igralec_id, :trener_id, :igralec_id, :izziv_id, :test1, :test2)
             """)
@@ -601,15 +606,16 @@ def update_izziv_igralec():
 
             db.session.commit()
 
-            # Return success response
-            return jsonify({'success': True, 'message': 'Challenge participation updated successfully'}), 200
+            return jsonify({'success': True, 'message': 'Meritve uspešno posodobljene'}), 200
 
         except Exception as e:
             print(e)
             db.session.rollback()
             return jsonify({'success': False, 'error': str(e)}), 500
 
-    return jsonify({'error': "GET method not allowed"}), 405
+    return jsonify({'error': "POST method not allowed"}), 405
+
+
 
 ## UPDATE DRUGI_IZZIV
 @app.route("/update_drugi_izziv", methods=['POST'])
@@ -836,6 +842,7 @@ def delete_izziv():
         try:
             podatki_json = request.get_json()
             izziv_id = podatki_json.get("izziv_id")
+            print(f"Received izziv_id: {izziv_id}")
 
             query = text("""
                 SELECT delete_izziv(:izziv_id)
@@ -863,6 +870,7 @@ def delete_izziv_igralec():
         try:
             podatki_json = request.get_json()
             izziv_igralec_id = podatki_json.get("izziv_igralec_id")
+
 
             query = text("""
                 SELECT delete_izziv_igralec(:izziv_igralec_id)
@@ -1163,6 +1171,43 @@ def get_all_izzivi_igralci_by_selekcija():
             return jsonify({'success': False, 'error': str(e)}), 500
 
     return jsonify({'error': "GET method not allowed"}), 405
+
+## GET ALL IZZIVI_IGRALCI BY IZZIV ID
+@app.route("/get_all_izzivi_igralci_by_izziv_id", methods=['POST'])
+def get_all_izzivi_igralci_by_izziv_id():
+    if request.method == 'POST':
+        try:
+            # Extract the izziv_id from the JSON request
+            data = request.get_json()
+            izziv_id = data.get("izziv_id")
+
+            # Call the SQL function
+            query = text("""
+                SELECT * FROM get_all_izzivi_igralci_by_izziv_id(:izziv_id)
+            """)
+            result = db.session.execute(query, {'izziv_id': izziv_id}).fetchall()
+
+            izzivi_igralci = [
+                {
+                    'id': row.izzivi_igralci_id,
+                    'trener_id': row.trener_id,
+                    'igralec_id': row.igralec_id,
+                    'izziv_id': row.izziv_id,
+                    'test1': row.test1,
+                    'test2': row.test2,
+                    'score_difference': row.score_difference
+                }
+                for row in result
+            ]
+
+            return jsonify({'success': True, 'izzivi_igralci': izzivi_igralci}), 200
+
+        except Exception as e:
+            print(e)
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    return jsonify({'error': "POST method not allowed"}), 405
+
 
 ## GET ALL DRUGI_IZZIVI BY SELECTION
 @app.route("/get_all_drugi_izzivi_by_selekcija", methods=['POST'])
