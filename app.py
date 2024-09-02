@@ -1462,6 +1462,42 @@ def get_izzivi_by_selekcija_id():
 
     return jsonify({'error': "POST method not allowed"}), 405
 
+## GET 2 IZZIVS AND IZZIVI_IGRALCI BY IGRALEC ID
+@app.route("/get_last_two_izzivi_with_scores_by_igralec_id", methods=['POST'])
+def get_last_two_izzivi_with_scores_by_igralec_id():
+    if request.method == 'POST':
+        try:
+            # Extract the igralec_id from the JSON request
+            podatki_json = request.get_json()
+            igralec_id = podatki_json.get("igralec_id")
+
+            # Call the SQL function
+            query = text("""
+                SELECT * FROM get_last_two_izzivi_with_scores_by_igralec_id(:igralec_id)
+            """)
+            result = db.session.execute(query, {'igralec_id': igralec_id}).fetchall()
+
+            # Convert the result into a list of dictionaries
+            izzivi = []
+            for row in result:
+                izziv = {
+                    'izziv_id': row.izziv_id,
+                    'ime': row.ime,
+                    'opis': row.opis,
+                    'tockovanje': row.točkovanje,
+                    'test1': row.test1,
+                    'test2': row.test2,
+                    'score_difference': row.score_difference
+                }
+                izzivi.append(izziv)
+
+            return jsonify({'success': True, 'izzivi': izzivi}), 200
+
+        except Exception as e:
+            print(e)
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    return jsonify({'error': "POST method not allowed"}), 405
 
 
 ## GET IZZIV BY ID

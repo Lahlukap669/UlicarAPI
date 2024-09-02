@@ -364,7 +364,7 @@ CREATE OR REPLACE FUNCTION get_all_selekcije_by_klub_id(p_klub_id BIGINT)
 RETURNS TABLE(id BIGINT, selekcija VARCHAR, opis TEXT) AS $$
 BEGIN
     RETURN QUERY
-    SELECT id, selekcija, opis
+    SELECT Selekcije.id, Selekcije.selekcija, Selekcije.opis
     FROM Selekcije
     WHERE klub_id = p_klub_id;
 END;
@@ -476,6 +476,38 @@ BEGIN
     SELECT Selekcije.id AS selekcija_id, Selekcije.selekcija AS selekcija_name, Selekcije.opis AS selekcija_opis
     FROM Selekcije
     WHERE Selekcije.klub_id = p_klub_id::BIGINT;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_last_two_izzivi_with_scores_by_igralec_id(p_igralec_id BIGINT)
+RETURNS TABLE(
+    izziv_id BIGINT,
+    ime VARCHAR,
+    opis TEXT,
+    točkovanje TEXT,
+    test1 FLOAT,
+    test2 FLOAT,
+    score_difference FLOAT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        i.id AS izziv_id,
+        i.ime,
+        i.opis,
+        i.točkovanje,
+        ii.test1,
+        ii.test2,
+        ii.score_difference
+    FROM 
+        Izzivi i
+    INNER JOIN 
+        Izzivi_igralci ii ON i.id = ii.izziv_id
+    WHERE 
+        ii.igralec_id = p_igralec_id
+    ORDER BY 
+        ii.id DESC
+    LIMIT 2;
 END;
 $$ LANGUAGE plpgsql;
 
