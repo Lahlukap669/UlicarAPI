@@ -386,24 +386,36 @@ def update_trener():
             ime = podatki_json.get("ime")
             priimek = podatki_json.get("priimek")
             gmail = podatki_json.get("gmail")
-            geslo = podatki_json.get("geslo")
+            geslo = podatki_json.get("geslo")  # This might be empty
             tel = podatki_json.get("tel")
 
-            # Hash the password before storing it
-            hashed_geslo = hashlib.sha256(geslo.encode('utf-8')).hexdigest()
+            if geslo:
+                # If the password is provided, hash it and call the function that updates the password
+                hashed_geslo = hashlib.sha256(geslo.encode('utf-8')).hexdigest()
 
-            # Call the update_trener function in the database
-            query = text("""
-                SELECT update_trener(:trener_id, :ime, :priimek, :gmail, :hashed_geslo, :tel)
-            """)
-            db.session.execute(query, {
-                'trener_id': trener_id,
-                'ime': ime,
-                'priimek': priimek,
-                'gmail': gmail,
-                'hashed_geslo': hashed_geslo,
-                'tel': tel
-            })
+                query = text("""
+                    SELECT update_trener(:trener_id, :ime, :priimek, :gmail, :hashed_geslo, :tel)
+                """)
+                db.session.execute(query, {
+                    'trener_id': trener_id,
+                    'ime': ime,
+                    'priimek': priimek,
+                    'gmail': gmail,
+                    'hashed_geslo': hashed_geslo,
+                    'tel': tel
+                })
+            else:
+                # If the password is not provided, call the function that does not update the password
+                query = text("""
+                    SELECT update_trener_without_password(:trener_id, :ime, :priimek, :gmail, :tel)
+                """)
+                db.session.execute(query, {
+                    'trener_id': trener_id,
+                    'ime': ime,
+                    'priimek': priimek,
+                    'gmail': gmail,
+                    'tel': tel
+                })
 
             db.session.commit()
 
@@ -416,6 +428,7 @@ def update_trener():
             return jsonify({'success': False, 'error': str(e)}), 500
 
     return jsonify({'error': "GET method not allowed"}), 405
+
 
 ## UPDATE SELEKCIJA
 @app.route("/update_selekcija", methods=['POST'])
@@ -466,27 +479,41 @@ def update_igralec():
             ime = podatki_json.get("ime")
             priimek = podatki_json.get("priimek")
             username = podatki_json.get("username")
-            geslo = podatki_json.get("geslo")
+            geslo = podatki_json.get("geslo")  # This might be empty
             tel = podatki_json.get("tel")
             score = podatki_json.get("score")
 
-            # Hash the password before storing it
-            hashed_geslo = hashlib.sha256(geslo.encode('utf-8')).hexdigest()
+            if geslo:
+                # If the password is provided, hash it and call the function that updates the password
+                hashed_geslo = hashlib.sha256(geslo.encode('utf-8')).hexdigest()
 
-            # Call the update_igralec function in the database
-            query = text("""
-                SELECT update_igralec(:igralec_id, :selekcija_id, :ime, :priimek, :username, :hashed_geslo, :tel, :score)
-            """)
-            db.session.execute(query, {
-                'igralec_id': igralec_id,
-                'selekcija_id': selekcija_id,
-                'ime': ime,
-                'priimek': priimek,
-                'username': username,
-                'hashed_geslo': hashed_geslo,
-                'tel': tel,
-                'score': score
-            })
+                query = text("""
+                    SELECT update_igralec(:igralec_id, :selekcija_id, :ime, :priimek, :username, :hashed_geslo, :tel, :score)
+                """)
+                db.session.execute(query, {
+                    'igralec_id': igralec_id,
+                    'selekcija_id': selekcija_id,
+                    'ime': ime,
+                    'priimek': priimek,
+                    'username': username,
+                    'hashed_geslo': hashed_geslo,
+                    'tel': tel,
+                    'score': score
+                })
+            else:
+                # If the password is not provided, call the function that does not update the password
+                query = text("""
+                    SELECT update_igralec_without_password(:igralec_id, :selekcija_id, :ime, :priimek, :username, :tel, :score)
+                """)
+                db.session.execute(query, {
+                    'igralec_id': igralec_id,
+                    'selekcija_id': selekcija_id,
+                    'ime': ime,
+                    'priimek': priimek,
+                    'username': username,
+                    'tel': tel,
+                    'score': score
+                })
 
             db.session.commit()
 
@@ -499,6 +526,8 @@ def update_igralec():
             return jsonify({'success': False, 'error': str(e)}), 500
 
     return jsonify({'error': "GET method not allowed"}), 405
+
+
 
 ## UPDATE TRENER_SELEKCIJA CONNECTION
 @app.route("/update_trener_selekcija", methods=['POST'])

@@ -180,6 +180,21 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION update_trener_without_password(
+    p_trener_id BIGINT, 
+    p_ime VARCHAR, 
+    p_priimek VARCHAR, 
+    p_gmail VARCHAR, 
+    p_tel VARCHAR
+)
+RETURNS VOID AS $$
+BEGIN
+    UPDATE Trenerji
+    SET ime = p_ime, priimek = p_priimek, gmail = p_gmail, tel = p_tel
+    WHERE id = p_trener_id;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION update_selekcija(p_selekcija_id BIGINT, p_klub_id BIGINT, p_selekcija VARCHAR, p_opis TEXT)
 RETURNS VOID AS $$
 BEGIN
@@ -197,6 +212,24 @@ BEGIN
     WHERE id = p_igralec_id;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION update_igralec_without_password(
+    p_igralec_id BIGINT, 
+    p_selekcija_id BIGINT, 
+    p_ime VARCHAR, 
+    p_priimek VARCHAR, 
+    p_username VARCHAR, 
+    p_tel VARCHAR, 
+    p_score FLOAT
+)
+RETURNS VOID AS $$
+BEGIN
+    UPDATE Igralci
+    SET selekcija_id = p_selekcija_id, ime = p_ime, priimek = p_priimek, username = p_username, tel = p_tel, score = p_score
+    WHERE id = p_igralec_id;
+END;
+$$ LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE FUNCTION update_trener_selekcija(p_trener_selekcija_id BIGINT, p_trener_id BIGINT, p_selekcija_id BIGINT)
 RETURNS VOID AS $$
