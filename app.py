@@ -1261,6 +1261,53 @@ def get_all_drugi_izzivi_by_selekcija():
 
     return jsonify({'error': "GET method not allowed"}), 405
 
+## GET ALL DRUGI_IZZIVI BY IGRALCI ID
+@app.route("/get_all_drugi_izzivi_by_igralec_id", methods=['POST'])
+def get_all_drugi_izzivi_by_igralec_id():
+    if request.method == 'POST':
+        try:
+            podatki_json = request.get_json()
+            igralec_id = podatki_json.get("igralec_id")
+
+            query = text("""
+                SELECT * FROM get_all_drugi_izzivi_by_igralec_id(:igralec_id)
+            """)
+            result = db.session.execute(query, {'igralec_id': igralec_id}).fetchall()
+
+            drugi_izzivi = [{'id': row.drugi_izziv_id, 'ime': row.ime, 'url': row.url} for row in result]
+
+            return jsonify({'success': True, 'drugi_izzivi': drugi_izzivi}), 200
+
+        except Exception as e:
+            print(e)
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    return jsonify({'error': "GET method not allowed"}), 405
+
+## GET ALL DRUGI_IZZIVI_IGRALCI BY IGRALCI ID
+@app.route("/get_all_drugi_izzivi_igralci_by_igralec_id", methods=['POST'])
+def get_all_drugi_izzivi_igralci_by_igralec_id():
+    if request.method == 'POST':
+        try:
+            podatki_json = request.get_json()
+            igralec_id = podatki_json.get("igralec_id")
+
+            query = text("""
+                SELECT * FROM get_all_drugi_izzivi_igralci_by_igralec_id(:igralec_id)
+            """)
+            result = db.session.execute(query, {'igralec_id': igralec_id}).fetchall()
+
+            drugi_izzivi_igralci = [{'id': row.id, 'drug_izziv_id': row.drug_izziv_id, 'tocke': row.tocke, 'photo_score': row.photo_score, 'approved': row.approved} for row in result]
+
+            return jsonify({'success': True, 'drugi_izzivi_igralci': drugi_izzivi_igralci}), 200
+
+        except Exception as e:
+            print(e)
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    return jsonify({'error': "GET method not allowed"}), 405
+
+
 ## GET ALL DRUGI_IZZIVI_IGRALCI BY SELECTION
 @app.route("/get_all_drugi_izzivi_igralci_by_selekcija", methods=['POST'])
 def get_all_drugi_izzivi_igralci_by_selekcija():

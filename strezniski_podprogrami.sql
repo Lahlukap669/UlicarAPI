@@ -371,14 +371,18 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION delete_drugi_izziv(p_drugi_izziv_id BIGINT)
 RETURNS BOOLEAN AS $$
 BEGIN
-    DELETE FROM Drugi_izzivi
-    WHERE id = p_drugi_izziv_id;
+    -- First, delete records in Drugi_izzivi_igralci related to the given drugi_izziv_id
+    DELETE FROM Drugi_izzivi_igralci WHERE drug_izziv_id = p_drugi_izziv_id;
+
+    -- Then, delete the record from Drugi_izzivi
+    DELETE FROM Drugi_izzivi WHERE id = p_drugi_izziv_id;
 
     RETURN TRUE;
 EXCEPTION WHEN OTHERS THEN
     RETURN FALSE;
 END;
 $$ LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE FUNCTION delete_drugi_izziv_igralec(p_drugi_izziv_igralec_id BIGINT)
 RETURNS BOOLEAN AS $$
@@ -648,6 +652,56 @@ BEGIN
     INNER JOIN Drugi_izzivi_igralci ON Drugi_izzivi_igralci.drug_izziv_id = Drugi_izzivi.id
     INNER JOIN Igralci ON Igralci.id = Drugi_izzivi_igralci.igralec_id
     WHERE Igralci.selekcija_id = p_selekcija_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_all_drugi_izzivi_by_igralec_id(p_igralec_id BIGINT)
+RETURNS TABLE (
+    drugi_izziv_id BIGINT,
+    ime VARCHAR,
+    url VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        Drugi_izzivi.id AS drugi_izziv_id,
+        Drugi_izzivi.ime,
+        Drugi_izzivi.url
+    FROM
+        Drugi_izzivi
+    WHERE
+        Drugi_izzivi.id IN (
+            SELECT drug_izziv_id FROM Drugi_izzivi_igralci WHERE igralec_id = p_igralec_id
+        )
+    ORDER BY
+        Drugi_izzivi.id DESC;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+CREATE OR REPLACE FUNCTION get_all_drugi_izzivi_igralci_by_igralec_id(p_igralec_id BIGINT)
+RETURNS TABLE(
+    id BIGINT,
+    drug_izziv_id BIGINT,
+    tocke FLOAT,
+    photo_score FLOAT,
+    approved BOOLEAN
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        id,
+        drug_izziv_id,
+        tocke,
+        photo_score,
+        approved
+    FROM 
+        Drugi_izzivi_igralci
+    WHERE 
+        igralec_id = p_igralec_id
+    ORDER BY 
+        id DESC;
 END;
 $$ LANGUAGE plpgsql;
 
