@@ -161,6 +161,94 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+CREATE OR REPLACE FUNCTION get_drugi_izzivi_for_trener(
+    p_trener_id BIGINT
+) 
+RETURNS TABLE (
+    drugi_izziv_igralec_id BIGINT,
+    drug_izziv_id BIGINT,
+    ime VARCHAR,
+    url VARCHAR,
+    igralec_id BIGINT,
+    tocke FLOAT,
+    trener_id BIGINT,
+    approved BOOLEAN
+) AS $$
+BEGIN
+    -- Get Drugi Izzivi without trener_id (not yet approved)
+    RETURN QUERY
+    SELECT 
+        diz_ig.id AS drugi_izziv_igralec_id,
+        diz_ig.drug_izziv_id,
+        diz.ime,
+        diz.url,
+        diz_ig.igralec_id,
+        diz_ig.tocke,
+        diz_ig.trener_id,
+        diz_ig.approved
+    FROM Drugi_izzivi_igralci diz_ig
+    INNER JOIN Drugi_izzivi diz ON diz_ig.drug_izziv_id = diz.id
+    WHERE diz_ig.trener_id IS NULL
+    AND diz_ig.igralec_id IN (
+        SELECT i.id -- Clarified to use Igralci table for igralec_id
+        FROM Trenerji_selekcije ts
+        INNER JOIN Igralci i ON ts.selekcija_id = i.selekcija_id
+        WHERE ts.trener_id = p_trener_id
+    )
+    ORDER BY diz_ig.id DESC
+    LIMIT 5;
+    
+    -- Get the last 5 approved Drugi Izzivi with trener_id
+    RETURN QUERY
+    SELECT 
+        diz_ig.id AS drugi_izziv_igralec_id,
+        diz_ig.drug_izziv_id,
+        diz.ime,
+        diz.url,
+        diz_ig.igralec_id,
+        diz_ig.tocke,
+        diz_ig.trener_id,
+        diz_ig.approved
+    FROM Drugi_izzivi_igralci diz_ig
+    INNER JOIN Drugi_izzivi diz ON diz_ig.drug_izziv_id = diz.id
+    WHERE diz_ig.trener_id IS NOT NULL
+    AND diz_ig.igralec_id IN (
+        SELECT i.id -- Clarified to use Igralci table for igralec_id
+        FROM Trenerji_selekcije ts
+        INNER JOIN Igralci i ON ts.selekcija_id = i.selekcija_id
+        WHERE ts.trener_id = p_trener_id
+    )
+    ORDER BY diz_ig.id DESC
+    LIMIT 5;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+    -- Get the last 5 Drugi Izzivi already approved by trener_id
+    RETURN QUERY
+    SELECT 
+        diz_ig.id AS drugi_izziv_igralec_id,
+        diz_ig.drug_izziv_id,
+        diz.ime,
+        diz.url,
+        diz_ig.igralec_id,
+        i.ime AS igralec_ime,
+        i.priimek AS igralec_priimek,
+        diz_ig.tocke,
+        diz_ig.trener_id,
+        diz_ig.approved
+    FROM Drugi_izzivi_igralci diz_ig
+    JOIN Drugi_izzivi diz ON diz_ig.drug_izziv_id = diz.id
+    JOIN Igralci i ON diz_ig.igralec_id = i.id
+    WHERE diz_ig.trener_id IS NOT NULL
+    AND i.selekcija_id = p_selekcija_id
+    ORDER BY diz_ig.id DESC
+    LIMIT 5;
+END;
+$$ LANGUAGE plpgsql;
+
+
 /*UPDATE FUNCTIONS*/
 CREATE OR REPLACE FUNCTION update_klub(p_klub_id BIGINT, p_ime VARCHAR)
 RETURNS VOID AS $$
@@ -544,7 +632,7 @@ BEGIN
         ii.igralec_id = p_igralec_id
     ORDER BY 
         ii.id DESC
-    LIMIT 2;
+    LIMIT 5;
 END;
 $$ LANGUAGE plpgsql;
 

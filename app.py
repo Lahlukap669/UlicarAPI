@@ -1681,6 +1681,57 @@ def login_trenerji():
                 'message': 'An error occurred during login'
             }), 500
 
+## GET DRUGI IZZIVI FOR TRENER
+@app.route("/get_drugi_izzivi_for_trener", methods=['POST'])
+def get_drugi_izzivi_for_trener():
+    if request.method == 'POST':
+        try:
+            # Extract the details from the request
+            podatki_json = request.get_json()
+            trener_id = podatki_json.get("trener_id")
+
+            # Call the SQL function
+            query = text("""
+                SELECT * FROM get_drugi_izzivi_for_trener(:trener_id)
+            """)
+            result = db.session.execute(query, {
+                'trener_id': trener_id,
+            }).fetchall()
+
+            # Process the results
+            unapproved_drugi_izzivi = []
+            approved_drugi_izzivi = []
+
+            for row in result:
+                izziv = {
+                    'drugi_izziv_igralec_id': row.drugi_izziv_igralec_id,
+                    'drug_izziv_id': row.drug_izziv_id,
+                    'ime': row.ime,
+                    'url': row.url,
+                    'igralec_id': row.igralec_id,
+                    'tocke': row.tocke,
+                    'trener_id': row.trener_id,
+                    'approved': row.approved
+                }
+
+                # Split into unapproved and approved lists
+                if row.trener_id is None:
+                    unapproved_drugi_izzivi.append(izziv)
+                else:
+                    approved_drugi_izzivi.append(izziv)
+
+            return jsonify({
+                'success': True, 
+                'unapproved': unapproved_drugi_izzivi,
+                'approved': approved_drugi_izzivi
+            }), 200
+
+        except Exception as e:
+            print(e)
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    return jsonify({'error': "GET method not allowed"}), 405
+
 
 ## LOGIN IGRALCI
 @app.route("/login_igralci", methods=['POST'])
