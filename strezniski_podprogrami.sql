@@ -766,7 +766,27 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
+CREATE OR REPLACE FUNCTION get_drugi_izziv_igralec_by_drugi_izziv_id(p_drugi_izziv_id BIGINT)
+RETURNS TABLE (
+    drugi_izziv_igralec_id BIGINT,
+    drug_izziv_id BIGINT,
+    ime VARCHAR,
+    tocke FLOAT,
+    approved BOOLEAN
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        diz_ig.id AS drugi_izziv_igralec_id,
+        diz_ig.drug_izziv_id,
+        diz.ime,
+        diz_ig.tocke,
+        diz_ig.approved
+    FROM Drugi_izzivi_igralci diz_ig
+    INNER JOIN Drugi_izzivi diz ON diz_ig.drug_izziv_id = diz.id
+    WHERE diz_ig.drug_izziv_id = p_drugi_izziv_id;
+END;
+$$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION get_all_drugi_izzivi_igralci_by_igralec_id(p_igralec_id BIGINT)
 RETURNS TABLE(

@@ -1307,6 +1307,41 @@ def get_all_drugi_izzivi_igralci_by_igralec_id():
 
     return jsonify({'error': "GET method not allowed"}), 405
 
+## GET DRUGI_IZZIV_IGRALEC BY DRUGI_IZZIV ID
+@app.route("/get_drugi_izziv_igralec_by_drugi_izziv_id", methods=['POST'])
+def get_drugi_izziv_igralec_by_drugi_izziv_id():
+    if request.method == 'POST':
+        try:
+            # Extract the drugi_izziv_id from the request data
+            podatki_json = request.get_json()
+            drugi_izziv_id = podatki_json.get("drugi_izziv_id")
+
+            # Call the SQL function
+            query = text("""
+                SELECT * FROM get_drugi_izziv_igralec_by_drugi_izziv_id(:drugi_izziv_id)
+            """)
+            result = db.session.execute(query, {'drugi_izziv_id': drugi_izziv_id}).fetchall()
+
+            # Process the results
+            drugi_izzivi_igralci = []
+            for row in result:
+                izziv = {
+                    'drugi_izziv_igralec_id': row.drugi_izziv_igralec_id,
+                    'drug_izziv_id': row.drug_izziv_id,
+                    'ime': row.ime,
+                    'tocke': row.tocke,
+                    'approved': row.approved
+                }
+                drugi_izzivi_igralci.append(izziv)
+
+            return jsonify({'success': True, 'drugi_izzivi_igralci': drugi_izzivi_igralci}), 200
+
+        except Exception as e:
+            print(e)
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    return jsonify({'error': "GET method not allowed"}), 405
+
 
 ## GET ALL DRUGI_IZZIVI_IGRALCI BY SELECTION
 @app.route("/get_all_drugi_izzivi_igralci_by_selekcija", methods=['POST'])
