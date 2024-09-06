@@ -50,12 +50,26 @@ RETURNS BIGINT AS $$
 DECLARE
     trener_selekcija_id BIGINT;
 BEGIN
+    -- Check if a trener_selekcija with the same trener_id and selekcija_id already exists
+    IF EXISTS (
+        SELECT 1 
+        FROM Trenerji_selekcije 
+        WHERE trener_id = p_trener_id AND selekcija_id = p_selekcija_id
+    ) THEN
+        -- If the record exists, return NULL or another appropriate value/message
+        RETURN NULL; -- Could also return 0 or a custom error code if preferred
+    END IF;
+
+    -- Otherwise, insert the new record
     INSERT INTO Trenerji_selekcije (trener_id, selekcija_id)
     VALUES (p_trener_id, p_selekcija_id)
     RETURNING id INTO trener_selekcija_id;
+
+    -- Return the ID of the newly created record
     RETURN trener_selekcija_id;
 END;
 $$ LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE FUNCTION create_izziv(p_selekcija_id BIGINT, p_ime VARCHAR, p_opis TEXT, p_tockovanje TEXT, p_tedenski_challenge BOOLEAN)
 RETURNS BIGINT AS $$
@@ -788,6 +802,19 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION get_all_trenerji_selekcije()
+RETURNS TABLE(
+    id BIGINT,
+    trener_id BIGINT,
+    selekcija_id BIGINT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT ts.id, ts.trener_id, ts.selekcija_id
+    FROM trenerji_selekcije ts;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION get_all_drugi_izzivi_igralci_by_igralec_id(p_igralec_id BIGINT)
 RETURNS TABLE(
     id BIGINT,
@@ -840,10 +867,10 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION get_all_registracije()
-RETURNS TABLE(id BIGINT, ime VARCHAR, priimek VARCHAR, username VARCHAR, tel VARCHAR, kraj_kluba VARCHAR, selekcija_id BIGINT, status VARCHAR) AS $$
+RETURNS TABLE(id BIGINT, ime VARCHAR, priimek VARCHAR, username VARCHAR, tel VARCHAR, kraj_kluba VARCHAR, selekcija_id BIGINT, status VARCHAR, tip VARCHAR) AS $$
 BEGIN
     RETURN QUERY
-    SELECT Registracija.id, Registracija.ime, Registracija.priimek, Registracija.username, Registracija.tel, Registracija.kraj_kluba, Registracija.selekcija_id, Registracija.status
+    SELECT Registracija.id, Registracija.ime, Registracija.priimek, Registracija.username, Registracija.tel, Registracija.kraj_kluba, Registracija.selekcija_id, Registracija.status, Registracija.tip
     FROM Registracija;
 END;
 $$ LANGUAGE plpgsql;

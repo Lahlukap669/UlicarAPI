@@ -158,15 +158,17 @@ def create_trener_selekcija():
             query = text("""
                 SELECT create_trener_selekcija(:trener_id, :selekcija_id)
             """)
-            trener_selekcija_id = db.session.execute(query, {
+            result = trener_selekcija_id = db.session.execute(query, {
                 'trener_id': trener_id,
                 'selekcija_id': selekcija_id
             }).scalar()
 
             db.session.commit()
 
-            # Return success response with the new trener_selekcija_id
-            return jsonify({'success': True, 'trener_selekcija_id': trener_selekcija_id}), 201
+            if result is not None:
+                return jsonify({'success': True, 'trener_selekcija_id': result}), 201
+            else:
+                return jsonify({'success': False, 'message': 'Trener is already associated with this selekcija'}), 400
 
         except Exception as e:
             print(e)
@@ -1093,6 +1095,33 @@ def get_trenerji_selekcije_by_trener_id():
 
     return jsonify({'error': "POST method not allowed"}), 405
 
+## GET ALL TRENERJI SELEKCIJE
+@app.route("/get_all_trenerji_selekcije", methods=['GET'])
+def get_all_trenerji_selekcije():
+    if request.method == 'GET':
+        try:
+            # Call the SQL function to get all trenerji_selekcije
+            query = text("""
+                SELECT * FROM get_all_trenerji_selekcije()
+            """)
+            result = db.session.execute(query).fetchall()
+
+            # Prepare the response
+            trenerji_selekcije = []
+            for row in result:
+                trenerji_selekcije.append({
+                    'id': row.id,
+                    'trener_id': row.trener_id,
+                    'selekcija_id': row.selekcija_id
+                })
+
+            return jsonify({'success': True, 'trenerji_selekcije': trenerji_selekcije}), 200
+
+        except Exception as e:
+            print(f"Error: {e}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    return jsonify({'error': "Invalid request method"}), 405
 
 ## GET ALL IZZIVI - IDEAS
 @app.route("/get_all_izzivi", methods=['GET'])
@@ -1125,7 +1154,7 @@ def get_all_registracije():
             """)
             result = db.session.execute(query).fetchall()
 
-            registracije = [{'id': row.id, 'ime': row.ime, 'priimek': row.priimek, 'username': row.username, 'tel': row.tel, 'kraj_kluba': row.kraj_kluba, 'selekcija_id': row.selekcija_id, 'status': row.status} for row in result]
+            registracije = [{'id': row.id, 'ime': row.ime, 'priimek': row.priimek, 'username': row.username, 'tel': row.tel, 'kraj_kluba': row.kraj_kluba, 'selekcija_id': row.selekcija_id, 'status': row.status, 'tip': row.tip} for row in result]
 
             return jsonify({'success': True, 'registracije': registracije}), 200
 
