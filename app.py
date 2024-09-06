@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-app.config['SQLALCHEMY_DATABASE_URI'] = ""
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://ketsqoxt:fcQSl8LgKt181nmEcPfazzY_oIYBsRQh@abul.db.elephantsql.com/ketsqoxt"
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 CORS(app)
