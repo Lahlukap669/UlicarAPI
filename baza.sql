@@ -90,7 +90,7 @@ CREATE TABLE Registracija (
     geslo VARCHAR NOT NULL,
     username VARCHAR NOT NULL,
     tel VARCHAR,
-    kraj_kluba VARCHAR NOT NULL,
+    kraj_kluba VARCHAR,
     selekcija_id BIGINT REFERENCES Selekcije(id),
     status VARCHAR NOT NULL
 );

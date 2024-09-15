@@ -3,6 +3,7 @@ import json
 import hashlib
 from flask_cors import CORS
 import os
+from key import api_key
 
 app = Flask(__name__)
 
@@ -11,7 +12,7 @@ from sqlalchemy.orm import sessionmaker
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://ketsqoxt:fcQSl8LgKt181nmEcPfazzY_oIYBsRQh@abul.db.elephantsql.com/ketsqoxt"
+app.config['SQLALCHEMY_DATABASE_URI'] = api_key
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 CORS(app)
