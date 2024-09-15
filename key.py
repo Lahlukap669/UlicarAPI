@@ -1,1 +1,0 @@
-api_key = "postgresql://avnadmin:AVNS_i7CKDWu3WrXhA4oyXXL@pg-2aa155c3-ulicar-front.g.aivencloud.com:18922/Ulicar?sslmode=require"
